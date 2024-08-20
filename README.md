@@ -1,1 +1,1 @@
-# lego-parts-cataloger
+# Lego Parts Cataloger
