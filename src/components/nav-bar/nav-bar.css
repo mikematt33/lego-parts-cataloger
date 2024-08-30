@@ -1,0 +1,61 @@
+.nav-bar-full-div {
+  border-bottom: 10px solid #d9d9d9;
+  display: flex;
+  align-items: center;
+}
+
+.light-mode-logo {
+  width: 30%;
+  margin: 15px;
+}
+
+.nav-bar-routes-div {
+  display: flex;
+  margin-left: 75px;
+}
+
+.nav-bar-route-button {
+  font-size: 24px;
+  margin-left: 30px;
+  cursor: pointer;
+  background-color: transparent;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.nav-bar-route-button:hover {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.nav-bar-route-button.selected {
+  padding: 12px;
+  background-color: rgba(67, 64, 220, 0.7);
+}
+
+.nav-bar-route-button.selected:hover {
+  background-color: rgba(67, 64, 220, 0.6);
+}
+
+.nav-bar-light-mode-switch-background {
+  margin-left: auto;
+  margin-right: 30px;
+  width: 160px;
+  height: 50px;
+  background-color: #eeeeee;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  filter: drop-shadow(0 1.5px 0.1rem gray);
+}
+.nav-bar-light-mode-switch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  background-color: white;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
