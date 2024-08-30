@@ -11,7 +11,7 @@
 
 .nav-bar-routes-div {
   display: flex;
-  margin-left: 75px;
+  margin-left: 100px;
 }
 
 .nav-bar-route-button {
@@ -19,10 +19,11 @@
   margin-left: 30px;
   cursor: pointer;
   background-color: transparent;
-  padding: 8px;
   border: none;
   border-radius: 10px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .nav-bar-route-button:hover {
@@ -30,7 +31,7 @@
 }
 
 .nav-bar-route-button.selected {
-  padding: 12px;
+  padding: 10px;
   background-color: rgba(67, 64, 220, 0.7);
 }
 
@@ -48,7 +49,9 @@
   display: flex;
   align-items: center;
   filter: drop-shadow(0 1.5px 0.1rem gray);
+  cursor: pointer;
 }
+
 .nav-bar-light-mode-switch {
   width: 40px;
   height: 40px;
@@ -58,4 +61,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.nav-bar-main-icon {
+  height: 35px;
+  width: 35px;
+  margin-right: 8px;
+}
+
+.nav-bar-mode-switch-icon {
+  height: 30px;
+  width: 30px;
 }
