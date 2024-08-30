@@ -1,12 +1,16 @@
 import React from "react";
-import SearchBar from "./search-bar/SearchBar";
+// import SearchBar from "./search-bar/SearchBar";
+import NavBar from "./nav-bar/NavBar";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <h1>Parts Search</h1>
-      <SearchBar />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<NavBar />} />
+      </Routes>
+    </Router>
   );
 }
 
