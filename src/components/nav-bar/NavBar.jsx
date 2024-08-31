@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
+import { FaListUl, FaHistory } from "react-icons/fa";
+import { IoSunnyOutline } from "react-icons/io5";
+import { LuGrid } from "react-icons/lu";
 
 import "./nav-bar.css";
 
@@ -34,7 +37,7 @@ const NavBar = ({ selectedPage }) => {
           }`}
           onClick={() => handlePageSelect("your-collections")}
         >
-          <i className="fa-solid fa-list-ul fa-xl"></i> Your Collections
+          <FaListUl className="nav-bar-main-icon" /> Your Collections
         </button>
         <button
           className={`nav-bar-route-button ${
@@ -42,7 +45,7 @@ const NavBar = ({ selectedPage }) => {
           }`}
           onClick={() => handlePageSelect("all-parts")}
         >
-          <i className="fa-solid fa-table-cells-large fa-xl"></i> All Parts
+          <LuGrid className="nav-bar-main-icon" /> All Parts
         </button>
         <button
           className={`nav-bar-route-button ${
@@ -50,12 +53,12 @@ const NavBar = ({ selectedPage }) => {
           }`}
           onClick={() => handlePageSelect("history")}
         >
-          <i className="fa-solid fa-clock-rotate-left fa-xl"></i> History
+          <FaHistory className="nav-bar-main-icon" /> History
         </button>
       </div>
       <div className="nav-bar-light-mode-switch-background">
         <div className="nav-bar-light-mode-switch">
-          <i class="fa-regular fa-sun fa-xl"></i>
+          <IoSunnyOutline className="nav-bar-mode-switch-icon" />
         </div>
         <h4 style={{ marginLeft: "10px" }}>Light Mode</h4>
       </div>
