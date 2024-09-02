@@ -1,0 +1,65 @@
+/* Size's are Temporary */
+label {
+  font-size: 15px;
+  cursor: default;
+}
+
+.lego-part-background {
+  background-color: #d9d9d9;
+  height: 375px;
+  width: 175px;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  flex-direction: column;
+}
+
+.lego-part-img {
+  height: 35%;
+  width: 85%;
+  margin-top: 12px;
+  border-radius: 10px;
+  filter: drop-shadow(0 1.5px 0.15rem gray);
+}
+
+.lego-part-id {
+  margin: 5px;
+  font-size: 15px;
+}
+
+.lego-part-title {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.lego-part-vars-background {
+  margin-top: 8px;
+  background-color: #bfbfbf;
+  height: 30%;
+  width: 90%;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.lego-part-var {
+  margin-top: 12px;
+}
+
+.lego-part-input-box {
+  width: 45%;
+  border-radius: 5px;
+  border: none;
+}
+
+.lego-part-button {
+  margin-top: 10px;
+  height: 6%;
+  width: 90%;
+  border: none;
+  border-radius: 5px;
+  background-color: #575757;
+  color: white;
+  font-size: 16px;
+}
