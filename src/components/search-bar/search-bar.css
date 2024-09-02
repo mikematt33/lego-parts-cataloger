@@ -1,0 +1,14 @@
+.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.pagination button {
+  margin: 0 5px;
+}
+.pagination span {
+  margin: 0 5px;
+}
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
