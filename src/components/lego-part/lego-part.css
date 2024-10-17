@@ -40,21 +40,34 @@ label {
   height: 30%;
   width: 90%;
   border-radius: 20px;
-  text-align: center;
+  text-align: left;
+  padding: 5px;
 }
 
 .lego-part-var {
-  margin-top: 12px;
+  margin-top: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lego-part-var label {
+  width: 40%;
+  text-align: left;
 }
 
 .lego-part-input-box {
+  font-size: 16px;
+  padding-left: 5px;
   width: 45%;
   border-radius: 5px;
+  font-weight: 600;
   border: none;
+  text-align: center;
 }
 
 .lego-part-button {
-  margin-top: 10px;
+  margin-top: 8px;
   height: 6%;
   width: 90%;
   border: none;
@@ -62,4 +75,31 @@ label {
   background-color: #575757;
   color: white;
   font-size: 16px;
+  margin-bottom: 6px;
+  cursor: not-allowed;
+}
+
+.lego-part-button.valid {
+  background-color: #4340dc;
+  cursor: pointer;
+}
+
+.lego-part-button.valid:hover {
+  background-color: #5a58d2;
+}
+
+.lego-part-select-box {
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.lego-part-input-box,
+.lego-part-select-box {
+  width: 52%; /* Adjust input width to match label */
+  border-radius: 5px;
+  border: none;
+  font-size: 14px;
 }
