@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import data from "../../data.js";
+import StaticPartBox from "../partbox/StaticPartBox.jsx";
 
 import "./search-bar.css";
 
@@ -119,8 +120,7 @@ const App = () => {
       <ul>
         {currentItems.map((item) => (
           <li key={item.part_num}>
-            {highlightText(item.part_num, searchQuery)} |{" "}
-            {highlightText(item.name, searchQuery)}
+            <StaticPartBox initPartNum={item.part_num} initPartName={item.name}/>
           </li>
         ))}
       </ul>
