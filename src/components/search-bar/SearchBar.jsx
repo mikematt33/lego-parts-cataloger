@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import data from "../../data.js";
 
+import LegoPart from "../lego-part/LegoPart"
+
 import "./search-bar.css";
 
 const App = () => {
@@ -92,6 +94,7 @@ const App = () => {
     setCurrentPage(newPage);
   };
 
+  // TODO: maybe get this working with the text on a part component, or remove
   const highlightText = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -107,6 +110,20 @@ const App = () => {
     );
   };
 
+  // function for adding a item to a userlist
+  const addToList = (quantity, color, condition) => {
+    const listData = 
+      JSON.parse(localStorage.getItem("example_name_list")) || [];
+    listData.push({
+      id: 0,
+      name: "example_name",
+      quantity,
+      condition,
+      color,
+    });
+    localStorage.setItem("example_name_list", JSON.stringify(listData));
+  }
+
   return (
     <div>
       <input
@@ -118,10 +135,7 @@ const App = () => {
 
       <ul>
         {currentItems.map((item) => (
-          <li key={item.part_num}>
-            {highlightText(item.part_num, searchQuery)} |{" "}
-            {highlightText(item.name, searchQuery)}
-          </li>
+          <LegoPart key={item.part_num} isPersonalList={false} partIdInput={item.part_num} partTitleInput={item.name} addToList={addToList}/>
         ))}
       </ul>
 
