@@ -2,22 +2,27 @@ import React, { useEffect, useState } from "react";
 
 import "./lego-part.css";
 
-const LegoPart = ({ isPersonalList }) => {
+const LegoPart = ({
+  isPersonalList,
+  partIdInput,
+  partTitleInput,
+  colorInput,
+  conditionInput,
+  quantityInput,
+  addToList,
+}) => {
   const colors = ["red", "blue", "green", "yellow", "black", "white"]; // Add / Remove colors as needed
 
-  const [partId, setPartId] = useState(null);
-  const [partTitle, setPartTitle] = useState(null);
-  const [color, setColor] = useState("");
-  const [condition, setCondition] = useState("");
-  const [quantity, setQuantity] = useState(0);
+  const [partId, setPartId] = useState(partIdInput);
+  const [partTitle, setPartTitle] = useState(partTitleInput);
+  const [color, setColor] = useState(colorInput);
+  const [condition, setCondition] = useState(conditionInput);
+  const [quantity, setQuantity] = useState(quantityInput);
   const [imgPath, setImgPath] = useState(`/public/images/${partId}.png`);
 
   const defaultImg = "/public/images/default.png";
 
-  useEffect(() => {
-    setPartId(); // Add part ID here
-    setPartTitle(); // Add part title here
-  }, []);
+  useEffect(() => {}, []);
 
   const handleImgError = () => {
     setImgPath(defaultImg);
@@ -101,6 +106,7 @@ const LegoPart = ({ isPersonalList }) => {
         <button
           className={`lego-part-button ${isFormValid ? "valid" : ""}`}
           disabled={!isFormValid}
+          onClick={() => addToList(quantity, color, condition)}
         >
           Add to List
         </button>
