@@ -1,62 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import data from "../../data.js";
-
-import LegoPart from "../lego-part/LegoPart"
-
+import LegoPart from "../lego-part/LegoPart";
 import "./search-bar.css";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState(data);
   const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const itemsPerPage = 20;
+  const debounceTime = 200; // time (in milliseconds) between when the user finishes input and when the search starts
 
-  // search function that looks through 'data' to find the specied part given a query
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-  
-    if (query === "") {
-      setFilteredData(data);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, debounceTime);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // normalize the given query to be more flexible. (ie. 1x1 is equivalent to 1 x 1)
+  const normalizeQuery = (query) => {
+    return query
+      .replace(/\s+/g, " ") // normalize multiple spaces to a single space
+      .replace(/(\d)x(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
+      .replace(/[^\w\s]/g, "") // remove non-alphanumeric characters
+      .trim()
+      .toLowerCase();
+  };
+
+  // function to match terms of the query in any order to the 'data'
+  const matchTerms = (string, query) => {
+    const queryTerms = query.split(" ");
+    const stringTerms = string.split(" ");
+
+    return queryTerms.every((term) =>
+      stringTerms.some((stringTerm) => stringTerm.includes(term))
+    );
+  };
+
+  // memoize filtered data, so when entering in queries with pauses in between, a rerender is not done redundantly
+  const filteredData = useMemo(() => {
+    if (debouncedSearchQuery === "") {
+      return data;
     } else {
-      const normalizedQuery = normalizeQuery(query);
-  
-      const filtered = data.filter((item) => {
+      const normalizedQuery = normalizeQuery(debouncedSearchQuery);
+
+      return data.filter((item) => {
         const normalizedPartNum = normalizeQuery(item.part_num);
         const normalizedName = normalizeQuery(item.name);
-  
+
         return (
           matchTerms(normalizedPartNum, normalizedQuery) ||
           matchTerms(normalizedName, normalizedQuery)
         );
       });
-      setFilteredData(filtered);
-      setCurrentPage(1);
     }
-  };
-
-  // function to normalize the query to make small differences irrelevant when searching
-  // ex. the query, "1x1" is considered the same as "1 x 1"
-  const normalizeQuery = (query) => {
-    return query
-      .replace(/\s+/g, " ") // normalize multiple spaces to a single space
-      .replace(/(\d)x(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
-      .replace(/[^\w\s]/g, "") // remove non-alphanumeric characters but keep spaces
-      .trim()
-      .toLowerCase();
-  };
-  
-
-  // function that checks that given a string and query, looks to see if all terms in the query are in the string
-  // this allows us to ignore order
-  const matchTerms = (string, query) => {
-    const queryTerms = query.split(" ");
-    const stringTerms = string.split(" ");
-    
-    return queryTerms.every((term) =>
-      stringTerms.some((stringTerm) => stringTerm.includes(term))
-    );
-  };
+  }, [debouncedSearchQuery]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -124,7 +125,21 @@ const App = () => {
     setCurrentPage(newPage);
   };
 
+  const addToList = (quantity, color, condition) => {
+    const listData =
+      JSON.parse(localStorage.getItem("example_name_list")) || [];
+    listData.push({
+      id: 0,
+      name: "example_name",
+      quantity,
+      condition,
+      color,
+    });
+    localStorage.setItem("example_name_list", JSON.stringify(listData));
+  };
+
   // TODO: maybe get this working with the text on a part component, or remove
+  // eslint-disable-next-line
   const highlightText = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -140,32 +155,24 @@ const App = () => {
     );
   };
 
-  // function for adding a item to a userlist
-  const addToList = (quantity, color, condition) => {
-    const listData = 
-      JSON.parse(localStorage.getItem("example_name_list")) || [];
-    listData.push({
-      id: 0,
-      name: "example_name",
-      quantity,
-      condition,
-      color,
-    });
-    localStorage.setItem("example_name_list", JSON.stringify(listData));
-  }
-
   return (
     <div>
       <input
         type="text"
         value={searchQuery}
-        onChange={handleSearch}
+        onChange={(e) => setSearchQuery(e.target.value)} // Update search query directly
         placeholder="Search by part number or name"
       />
 
       <ul>
         {currentItems.map((item) => (
-          <LegoPart key={item.part_num} isPersonalList={false} partIdInput={item.part_num} partTitleInput={item.name} addToList={addToList}/>
+          <LegoPart
+            key={item.part_num}
+            isPersonalList={false}
+            partIdInput={item.part_num}
+            partTitleInput={item.name}
+            addToList={addToList}
+          />
         ))}
       </ul>
 
