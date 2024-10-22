@@ -11,21 +11,51 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  // search function that looks through 'data' to find the specied part given a query
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
+    const query = e.target.value;
     setSearchQuery(query);
-
+  
     if (query === "") {
       setFilteredData(data);
     } else {
-      const filtered = data.filter(
-        (item) =>
-          item.part_num.toLowerCase().includes(query) ||
-          item.name.toLowerCase().includes(query)
-      );
+      const normalizedQuery = normalizeQuery(query);
+  
+      const filtered = data.filter((item) => {
+        const normalizedPartNum = normalizeQuery(item.part_num);
+        const normalizedName = normalizeQuery(item.name);
+  
+        return (
+          matchTerms(normalizedPartNum, normalizedQuery) ||
+          matchTerms(normalizedName, normalizedQuery)
+        );
+      });
       setFilteredData(filtered);
       setCurrentPage(1);
     }
+  };
+
+  // function to normalize the query to make small differences irrelevant when searching
+  // ex. the query, "1x1" is considered the same as "1 x 1"
+  const normalizeQuery = (query) => {
+    return query
+      .replace(/\s+/g, " ") // normalize multiple spaces to a single space
+      .replace(/(\d)x(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
+      .replace(/[^\w\s]/g, "") // remove non-alphanumeric characters but keep spaces
+      .trim()
+      .toLowerCase();
+  };
+  
+
+  // function that checks that given a string and query, looks to see if all terms in the query are in the string
+  // this allows us to ignore order
+  const matchTerms = (string, query) => {
+    const queryTerms = query.split(" ");
+    const stringTerms = string.split(" ");
+    
+    return queryTerms.every((term) =>
+      stringTerms.some((stringTerm) => stringTerm.includes(term))
+    );
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
