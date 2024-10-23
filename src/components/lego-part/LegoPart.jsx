@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ColorSelect from "../color-select/ColorSelect";
 
 import "./lego-part.css";
 
@@ -6,16 +7,16 @@ const LegoPart = ({
   isPersonalList,
   partIdInput,
   partTitleInput,
-  colorInput,
+  colorNameInput,
+  colorHexInput,
   conditionInput,
   quantityInput,
   addToList,
 }) => {
-  const colors = ["red", "blue", "green", "yellow", "black", "white"]; // Add / Remove colors as needed
-
   const [partId, setPartId] = useState(partIdInput);
   const [partTitle, setPartTitle] = useState(partTitleInput);
-  const [color, setColor] = useState(colorInput);
+  const [colorName, setColorName] = useState(colorNameInput);
+  const [colorHex, setColorHex] = useState(colorHexInput);
   const [condition, setCondition] = useState(conditionInput);
   const [quantity, setQuantity] = useState(quantityInput);
   const [imgPath, setImgPath] = useState(`/public/images/${partId}.png`);
@@ -34,7 +35,8 @@ const LegoPart = ({
   };
 
   const handleColorChange = (event) => {
-    setColor(event.target.value);
+    setColorName(event.name);
+    setColorHex(event.rgb);
   };
 
   const handleConditionChange = (event) => {
@@ -42,7 +44,8 @@ const LegoPart = ({
   };
 
   // Check if all inputs are valid
-  const isFormValid = quantity > 0 && color !== "" && condition !== "";
+  const isFormValid =
+    quantity > 0 && colorName !== undefined && condition !== undefined;
 
   return (
     <div className="lego-part-background">
@@ -69,27 +72,17 @@ const LegoPart = ({
         </div>
         <div className="lego-part-var flex-container">
           <label htmlFor="lego-color">Color: </label>
-          <select
-            id="lego-color"
-            value={color}
-            onChange={handleColorChange}
-            className="lego-part-select-box"
-          >
-            <option value="" disabled hidden>
-              ⸻
-            </option>
-            {colors.map((colorOption) => (
-              <option key={colorOption} value={colorOption}>
-                {colorOption.charAt(0).toUpperCase() + colorOption.slice(1)}{" "}
-              </option>
-            ))}
-          </select>
+          <ColorSelect
+            colorName={colorName}
+            colorHex={colorHex}
+            handleColorChange={handleColorChange}
+          />
         </div>
         <div className="lego-part-var flex-container">
           <label htmlFor="lego-condition">Condition: </label>
           <select
             id="lego-condition"
-            value={condition}
+            value={condition || ""}
             onChange={handleConditionChange}
             className="lego-part-select-box"
           >
@@ -106,7 +99,7 @@ const LegoPart = ({
         <button
           className={`lego-part-button ${isFormValid ? "valid" : ""}`}
           disabled={!isFormValid}
-          onClick={() => addToList(quantity, color, condition)}
+          onClick={() => addToList(quantity, colorName, condition)}
         >
           Add to List
         </button>

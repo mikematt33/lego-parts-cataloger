@@ -1,0 +1,192 @@
+/* ********** Color Select ********** */
+.color-select-flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 75%;
+}
+
+.color-select-text {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px;
+  background-color: #eee;
+  border-radius: 5px;
+  margin-right: 8px;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65%;
+}
+
+.color-select-button {
+  height: 30px;
+  width: 35px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ********** Color Modal ********** */
+.color-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.color-modal-content {
+  position: relative;
+  background-color: rgba(237, 237, 237, 0.85);
+  padding: 25px;
+  border-radius: 8px;
+  width: 70%;
+  height: 65%;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.color-modal-close {
+  position: absolute;
+  top: 13%;
+  right: 12.5%;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  padding: 5px 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+}
+
+ul {
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(100px, 1fr)
+  ); /* Grid created with auto filling columns */
+  grid-gap: 15px;
+}
+
+/* Search Bar // Categories */
+.color-search-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  box-shadow: 1px 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.color-categories {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 15px;
+}
+
+.category-button {
+  padding: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-size: cover;
+  display: inline-block;
+}
+
+.category-button.active {
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.3);
+}
+
+.reset-button {
+  background-color: transparent;
+  border: 1px solid red;
+  font-size: 20px;
+  color: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-weight: bold;
+}
+
+/* ********** Color Item ********** */
+.color-item {
+  list-style: none;
+  cursor: pointer;
+}
+
+.color-item-background {
+  position: relative;
+  padding: 5px;
+  border-radius: 4px;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: #434343; /* Background color is set dynamically (this is default) */
+  overflow: hidden;
+}
+
+.color-item-background .color-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(128, 128, 128, 0.8);
+  color: white;
+  text-align: center;
+  padding: 5px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  min-height: 25px;
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+.color-item-background:hover .color-info {
+  height: 45%;
+}
+
+.color-info .color-name {
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.color-info .color-hex {
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.color-item-background:hover .color-hex {
+  opacity: 1;
+}

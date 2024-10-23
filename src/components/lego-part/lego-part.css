@@ -6,12 +6,13 @@ label {
 
 .lego-part-background {
   background-color: #d9d9d9;
-  height: 375px;
-  width: 175px;
+  height: 400px;
+  width: 200px;
   display: flex;
   align-items: center;
   border-radius: 20px;
   flex-direction: column;
+  padding: 10px;
 }
 
 .lego-part-img {
@@ -19,33 +20,30 @@ label {
   width: 85%;
   margin-top: 12px;
   border-radius: 10px;
+  object-fit: cover;
   filter: drop-shadow(0 1.5px 0.15rem gray);
 }
 
-.lego-part-id {
-  margin: 5px;
+/* Part ID and title */
+.lego-part-id,
+.lego-part-title {
+  margin: 5px 0;
+  text-align: center;
   font-size: 15px;
 }
 
-.lego-part-title {
-  margin: 0;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-}
-
 .lego-part-vars-background {
-  margin-top: 8px;
+  margin-top: 10px;
   background-color: #bfbfbf;
-  height: 30%;
+  height: 45%;
   width: 90%;
   border-radius: 20px;
   text-align: left;
-  padding: 5px;
+  padding: 10px;
 }
 
 .lego-part-var {
-  margin-top: 13px;
+  margin-top: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -58,8 +56,9 @@ label {
 
 .lego-part-input-box {
   font-size: 16px;
+  height: 25px;
   padding-left: 5px;
-  width: 45%;
+  width: 35%; /* Adjust width for better alignment */
   border-radius: 5px;
   font-weight: 600;
   border: none;
@@ -68,10 +67,10 @@ label {
 
 .lego-part-button {
   margin-top: 8px;
-  height: 6%;
-  width: 90%;
+  height: 35px; /* Adjust height */
+  width: 100%;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   background-color: #575757;
   color: white;
   font-size: 16px;
@@ -94,12 +93,27 @@ label {
   border-radius: 5px;
   font-weight: 600;
   text-align: center;
+  height: 30px;
 }
 
+/* Always show arrows for number input in WebKit browsers (Chrome, Safari) */
+input[type="number"] {
+  appearance: textfield; /* Standard property for compatibility */
+  -webkit-appearance: textfield; /* Removes default spinner style */
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: inner-spin-button;
+  opacity: 1; /* Ensure the spinner is always visible */
+}
+
+/* 
 .lego-part-input-box,
 .lego-part-select-box {
-  width: 52%; /* Adjust input width to match label */
+  width: 52%; 
   border-radius: 5px;
   border: none;
   font-size: 14px;
 }
+*/
