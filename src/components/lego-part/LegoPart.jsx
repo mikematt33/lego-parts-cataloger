@@ -56,7 +56,9 @@ const LegoPart = ({
         className="lego-part-img"
       />
       <p className="lego-part-id">ID: {partId}</p>
-      <p className="lego-part-title">{partTitle}</p>
+      <div className="lego-part-scroll-text">
+        <p className="lego-part-title">{partTitle}</p>
+      </div>
       <div className="lego-part-vars-background">
         <div className="lego-part-var">
           <label htmlFor="lego-quantity">Quantity: </label>
