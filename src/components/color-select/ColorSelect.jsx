@@ -32,14 +32,26 @@ function ColorModal({ colors, onClose, onSelectColor }) {
     const categorized = colors.map((color) => {
       const hsl = hexToHSL(color.rgb);
       const category = categorizeColorByHue(hsl);
+      console.log(color.name, color.rgb, hsl, category);
       return { ...color, category };
     });
     setCategorizedColors(categorized);
+    console.log(categorized);
   }, [colors]);
 
   // Function to filter and sort colors based on search term or category
   const filterColors = () => {
     let filtered = categorizedColors;
+
+    const categoryOrder = [
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "gray",
+    ];
 
     if (searchTerm.startsWith("#")) {
       // Search by hex if search starts with #
@@ -53,10 +65,12 @@ function ColorModal({ colors, onClose, onSelectColor }) {
         (color) => color.category === selectedCategory
       );
     } else if (!searchTerm) {
-      // If no search term or category, sort colors by category
-      filtered = categorizedColors.sort((a, b) =>
-        a.category.localeCompare(b.category)
-      );
+      // If no search term or category, sort colors by predefined category order
+      filtered = categorizedColors.sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a.category);
+        const indexB = categoryOrder.indexOf(b.category);
+        return indexA - indexB;
+      });
     }
 
     // Filter by name if a search term exists

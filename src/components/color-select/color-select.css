@@ -74,16 +74,13 @@ ul {
   padding: 0;
   margin: 20px 0;
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(100px, 1fr)
-  ); /* Grid created with auto filling columns */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   grid-gap: 15px;
 }
 
 /* Search Bar // Categories */
 .color-search-input {
-  width: 100%;
+  width: 98%;
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid #ddd;

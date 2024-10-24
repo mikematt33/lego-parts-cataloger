@@ -44,23 +44,24 @@ export function categorizeColorByHue(hsl) {
 
   // Handle whites, grays, blacks based on lightness and saturation
   if (s < 15) {
-    if (l > 90) return "white"; // Whites (very light)
-    if (l < 20) return "black"; // Blacks (very dark)
+    if (l > 90) return "gray"; // Whites (very light)
+    if (l < 20) return "gray"; // Blacks (very dark)
     return "gray"; // Grays or neutral tones (low saturation)
   }
 
   // Special handling for very dark colors based on hue
   if (l < 30) {
-    if (h >= 0 && h < 60) return "dark red"; // Dark reds and oranges
-    if (h >= 60 && h < 150) return "dark green"; // Dark yellows and greens
-    if (h >= 150 && h < 240) return "dark blue"; // Dark blue range
-    if (h >= 240 && h < 320) return "dark purple"; // Dark purple range
+    if (l < 10) return "gray";
+    if (h >= 0 && h < 60) return "red"; // Dark reds and oranges
+    if (h >= 60 && h < 150) return "green"; // Dark yellows and greens
+    if (h >= 150 && h < 240) return "blue"; // Dark blue range
+    if (h >= 240 && h < 320) return "purple"; // Dark purple range
     return "gray"; // Any other dark neutral tones
   }
 
   // Fine-tuned hue ranges for vibrant colors
-  if ((h >= 0 && h < 15) || (h >= 345 && h <= 360)) {
-    return "red"; // Narrower red range
+  if ((h >= 0 && h < 15) || (h >= 325 && h <= 360)) {
+    return "red";
   } else if (h >= 15 && h < 45) {
     return "orange";
   } else if (h >= 45 && h < 75) {
