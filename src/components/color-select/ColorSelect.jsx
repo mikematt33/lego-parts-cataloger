@@ -32,11 +32,9 @@ function ColorModal({ colors, onClose, onSelectColor }) {
     const categorized = colors.map((color) => {
       const hsl = hexToHSL(color.rgb);
       const category = categorizeColorByHue(hsl);
-      console.log(color.name, color.rgb, hsl, category);
       return { ...color, category };
     });
     setCategorizedColors(categorized);
-    console.log(categorized);
   }, [colors]);
 
   // Function to filter and sort colors based on search term or category
