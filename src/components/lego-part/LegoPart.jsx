@@ -56,16 +56,18 @@ const LegoPart = ({
         className="lego-part-img"
       />
       <p className="lego-part-id">ID: {partId}</p>
-      <p className="lego-part-title">{partTitle}</p>
+      <div className="lego-part-scroll-text">
+        <p className="lego-part-title">{partTitle}</p>
+      </div>
       <div className="lego-part-vars-background">
-        <div className="lego-part-var">
+        <div style={{ marginTop: "1px" }} className="lego-part-var">
           <label htmlFor="lego-quantity">Quantity: </label>
           <input
             className="lego-part-input-box"
             id="lego-quantity"
             type="number"
             min="0"
-            value={quantity}
+            value={quantity || ""}
             onInput={handleQuantityChange}
             placeholder="⸻"
           />
