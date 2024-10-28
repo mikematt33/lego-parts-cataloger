@@ -20,6 +20,7 @@ const LegoPart = ({
   const [condition, setCondition] = useState(conditionInput);
   const [quantity, setQuantity] = useState(quantityInput);
   const [imgPath, setImgPath] = useState(`/public/images/${partId}.png`);
+  const [colorKey, setColorKey] = useState(0);
 
   const defaultImg = "/public/images/default.png";
 
@@ -75,6 +76,7 @@ const LegoPart = ({
         <div className="lego-part-var flex-container">
           <label htmlFor="lego-color">Color: </label>
           <ColorSelect
+            key={colorKey}
             colorName={colorName}
             colorHex={colorHex}
             handleColorChange={handleColorChange}
@@ -101,7 +103,21 @@ const LegoPart = ({
         <button
           className={`lego-part-button ${isFormValid ? "valid" : ""}`}
           disabled={!isFormValid}
-          onClick={() => addToList(quantity, colorName, condition)}
+          onClick={() => {
+            addToList(
+              partId,
+              partTitle,
+              colorName,
+              colorHex,
+              condition,
+              quantity
+            );
+            setColorName(undefined);
+            setColorHex(undefined);
+            setCondition(undefined);
+            setQuantity(0);
+            setColorKey((prevKey) => prevKey + 1);
+          }}
         >
           Add to List
         </button>

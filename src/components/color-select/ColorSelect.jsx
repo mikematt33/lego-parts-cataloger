@@ -164,10 +164,10 @@ function ColorModal({ colors, onClose, onSelectColor }) {
 function ColorSelect({ colorName, colorHexInput, handleColorChange }) {
   const [colors, setColors] = useState([]);
   const [selectedColorInput, setSelectedColorInput] = useState(
-    colorHexInput || "#eaeaea"
+    colorHexInput ? `#${colorHexInput}` : "#eaeaea"
   );
   const [selectedColor, setSelectedColor] = useState(
-    colorName || { name: "⸻" }
+    colorName ? { name: colorName } : { name: "⸻" }
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -177,7 +177,6 @@ function ColorSelect({ colorName, colorHexInput, handleColorChange }) {
       name: color.name,
       rgb: color.rgb,
     }));
-
     setColors(filteredColors);
   }, []);
 
