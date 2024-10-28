@@ -37,25 +37,44 @@ function ColorModal({ colors, onClose, onSelectColor }) {
     setCategorizedColors(categorized);
   }, [colors]);
 
-  // Function to filter colors based on search term or category
+  // Function to filter and sort colors based on search term or category
   const filterColors = () => {
+    let filtered = categorizedColors;
+
+    const categoryOrder = [
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "gray",
+    ];
+
     if (searchTerm.startsWith("#")) {
       // Search by hex if search starts with #
       const hex = searchTerm.substring(1).toLowerCase();
-      return categorizedColors.filter((color) =>
+      filtered = categorizedColors.filter((color) =>
         color.rgb.toLowerCase().startsWith(hex)
       );
     } else if (selectedCategory) {
       // Filters by category
-      return categorizedColors.filter(
+      filtered = categorizedColors.filter(
         (color) => color.category === selectedCategory
       );
-    } else {
-      // No category or search term -> show all colors
-      return categorizedColors.filter((color) =>
-        color.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    } else if (!searchTerm) {
+      // If no search term or category, sort colors by predefined category order
+      filtered = categorizedColors.sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a.category);
+        const indexB = categoryOrder.indexOf(b.category);
+        return indexA - indexB;
+      });
     }
+
+    // Filter by name if a search term exists
+    return filtered.filter((color) =>
+      color.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   };
 
   // Color categories for visual category buttons
