@@ -7,7 +7,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-  const itemsPerPage = 20;
+  const itemsPerPage = 100;
   const debounceTime = 200; // time (in milliseconds) between when the user finishes input and when the search starts
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const App = () => {
   const normalizeQuery = (query) => {
     return query
       .replace(/\s+/g, " ") // normalize multiple spaces to a single space
-      .replace(/(\d)x(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
+      .replace(/(\d)\s*x\s*(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
       .replace(/[^\w\s]/g, "") // remove non-alphanumeric characters
       .trim()
       .toLowerCase();
@@ -36,9 +36,17 @@ const App = () => {
     const stringTerms = string.split(" ");
 
     return queryTerms.every((term) =>
-      stringTerms.some((stringTerm) => stringTerm.includes(term))
+      stringTerms.some((stringTerm) => stringTerm.startsWith(term))
     );
   };
+  
+  const preprocessedData = useMemo(() => {
+    return data.map(item => ({
+      ...item,
+      normalizedPartNum: normalizeQuery(item.part_num),
+      normalizedName: normalizeQuery(item.name),
+    }));
+  }, [data]);
 
   // memoize filtered data, so when entering in queries with pauses in between, a rerender is not done redundantly
   const filteredData = useMemo(() => {
@@ -46,18 +54,13 @@ const App = () => {
       return data;
     } else {
       const normalizedQuery = normalizeQuery(debouncedSearchQuery);
-
-      return data.filter((item) => {
-        const normalizedPartNum = normalizeQuery(item.part_num);
-        const normalizedName = normalizeQuery(item.name);
-
-        return (
-          matchTerms(normalizedPartNum, normalizedQuery) ||
-          matchTerms(normalizedName, normalizedQuery)
-        );
-      });
+  
+      return preprocessedData.filter((item) =>
+        matchTerms(item.normalizedPartNum, normalizedQuery) ||
+        matchTerms(item.normalizedName, normalizedQuery)
+      );
     }
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, preprocessedData]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
