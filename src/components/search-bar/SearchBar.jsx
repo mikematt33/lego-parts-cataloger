@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import LegoPart from "../lego-part/LegoPart";
 import "./search-bar.css";
 
-const SearchWorker = new Worker(new URL("./searchWebWorker.js", import.meta.url));
-
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredResults, setFilteredResults] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
+  const [worker, setWorker] = useState(null); // use this to keep the webworker we create in useEffect
   const itemsPerPage = 100;
   const debounceTime = 200; // debounce time in milliseconds
 
   // Normalize the given query to be more flexible.
-  const normalizeQuery = (query) => {
+  const normalizeQuery = (query) => { 
     return query
       .replace(/\s+/g, " ")
       .replace(/(\d)\s*x\s*(\d)/g, "$1 x $2")
@@ -24,15 +23,25 @@ const App = () => {
   };
 
   useEffect(() => {
+    // create the webworker here to avoid having to remake it every render
+    const searchWorker = new Worker(new URL("./searchWebWorker.js", import.meta.url));
+
     // Set up the message handler for the worker
-    SearchWorker.onmessage = (e) => {
+    searchWorker.onmessage = (e) => {
       setFilteredResults(e.data.paginatedData);
       setTotalResults(e.data.totalResults);
     };
 
+    // error logging for debug
+    searchWorker.onerror = (error) => {
+      console.error("searchWorker error: ", error)
+    };
+
+    setWorker(searchWorker);
+
     return () => {
       // Clean up the worker when the component unmounts
-      SearchWorker.terminate();
+      searchWorker.terminate();
     };
   }, []);
 
@@ -48,17 +57,17 @@ const App = () => {
   }, [searchQuery]);
 
   // triggers for searching (ie. debouncedSearchQuery is changed, or the page changes)
-  useEffect(() => {
+  useEffect(() => { 
     // Now use the web worker to search with the debounced query
     if (debouncedSearchQuery) {
       const normalizedQuery = normalizeQuery(debouncedSearchQuery);
-      SearchWorker.postMessage({
+      worker.postMessage({
         normalizedQuery, // Change here to match your worker's expected property
         itemsPerPage,
         currentPage,
       });
     }
-  }, [debouncedSearchQuery, currentPage]); // Also trigger when currentPage changes
+  }, [debouncedSearchQuery, currentPage, worker]); // Also trigger when currentPage changes
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
