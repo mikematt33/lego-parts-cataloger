@@ -1,15 +1,42 @@
-import React, { useState, useEffect, useMemo } from "react";
-import data from "../../data.js";
+import React, { useState, useEffect } from "react";
 import LegoPart from "../lego-part/LegoPart";
 import "./search-bar.css";
 
+const SearchWorker = new Worker(new URL("./searchWebWorker.js", import.meta.url));
+
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
   const itemsPerPage = 100;
-  const debounceTime = 200; // time (in milliseconds) between when the user finishes input and when the search starts
+  const debounceTime = 200; // debounce time in milliseconds
 
+  // Normalize the given query to be more flexible.
+  const normalizeQuery = (query) => {
+    return query
+      .replace(/\s+/g, " ")
+      .replace(/(\d)\s*x\s*(\d)/g, "$1 x $2")
+      .replace(/[^\w\s]/g, "")
+      .trim()
+      .toLowerCase();
+  };
+
+  useEffect(() => {
+    // Set up the message handler for the worker
+    SearchWorker.onmessage = (e) => {
+      setFilteredResults(e.data.paginatedData);
+      setTotalResults(e.data.totalResults);
+    };
+
+    return () => {
+      // Clean up the worker when the component unmounts
+      SearchWorker.terminate();
+    };
+  }, []);
+
+  // Debounce the search query
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
@@ -20,53 +47,24 @@ const App = () => {
     };
   }, [searchQuery]);
 
-  // normalize the given query to be more flexible. (ie. 1x1 is equivalent to 1 x 1)
-  const normalizeQuery = (query) => {
-    return query
-      .replace(/\s+/g, " ") // normalize multiple spaces to a single space
-      .replace(/(\d)\s*x\s*(\d)/g, "$1 x $2") // handle cases like 1x1, 1x2, 2x4, etc.
-      .replace(/[^\w\s]/g, "") // remove non-alphanumeric characters
-      .trim()
-      .toLowerCase();
-  };
-
-  // function to match terms of the query in any order to the 'data'
-  const matchTerms = (string, query) => {
-    const queryTerms = query.split(" ");
-    const stringTerms = string.split(" ");
-
-    return queryTerms.every((term) =>
-      stringTerms.some((stringTerm) => stringTerm.startsWith(term))
-    );
-  };
-  
-  const preprocessedData = useMemo(() => {
-    return data.map(item => ({
-      ...item,
-      normalizedPartNum: normalizeQuery(item.part_num),
-      normalizedName: normalizeQuery(item.name),
-    }));
-  }, [data]);
-
-  // memoize filtered data, so when entering in queries with pauses in between, a rerender is not done redundantly
-  const filteredData = useMemo(() => {
-    if (debouncedSearchQuery === "") {
-      return data;
-    } else {
+  // triggers for searching (ie. debouncedSearchQuery is changed, or the page changes)
+  useEffect(() => {
+    // Now use the web worker to search with the debounced query
+    if (debouncedSearchQuery) {
       const normalizedQuery = normalizeQuery(debouncedSearchQuery);
-  
-      return preprocessedData.filter((item) =>
-        matchTerms(item.normalizedPartNum, normalizedQuery) ||
-        matchTerms(item.normalizedName, normalizedQuery)
-      );
+      SearchWorker.postMessage({
+        normalizedQuery, // Change here to match your worker's expected property
+        itemsPerPage,
+        currentPage,
+      });
     }
-  }, [debouncedSearchQuery, preprocessedData]);
+  }, [debouncedSearchQuery, currentPage]); // Also trigger when currentPage changes
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredResults.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(totalResults / itemsPerPage); // Corrected to use totalResults
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -84,10 +82,7 @@ const App = () => {
 
     if (currentPage > 1) {
       pages.push(
-        <button
-          key={currentPage - 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
+        <button key={currentPage - 1} onClick={() => handlePageChange(currentPage - 1)}>
           {currentPage - 1}
         </button>
       );
@@ -101,10 +96,7 @@ const App = () => {
 
     if (currentPage < totalPages) {
       pages.push(
-        <button
-          key={currentPage + 1}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
+        <button key={currentPage + 1} onClick={() => handlePageChange(currentPage + 1)}>
           {currentPage + 1}
         </button>
       );
@@ -129,8 +121,7 @@ const App = () => {
   };
 
   const addToList = (quantity, color, condition) => {
-    const listData =
-      JSON.parse(localStorage.getItem("example_name_list")) || [];
+    const listData = JSON.parse(localStorage.getItem("example_name_list")) || [];
     listData.push({
       id: 0,
       name: "example_name",
@@ -141,7 +132,6 @@ const App = () => {
     localStorage.setItem("example_name_list", JSON.stringify(listData));
   };
 
-  // TODO: maybe get this working with the text on a part component, or remove
   // eslint-disable-next-line
   const highlightText = (text, query) => {
     if (!query) return text;
@@ -163,7 +153,7 @@ const App = () => {
       <input
         type="text"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)} // Update search query directly
+        onChange={(e) => setSearchQuery(e.target.value)} // Update search query directly here
         placeholder="Search by part number or name"
       />
 
@@ -180,17 +170,11 @@ const App = () => {
       </ul>
 
       <div className="pagination">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
           Previous
         </button>
         {renderPageNumbers()}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
