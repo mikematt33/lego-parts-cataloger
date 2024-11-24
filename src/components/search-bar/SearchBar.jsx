@@ -16,7 +16,7 @@ const App = () => {
   const normalizeQuery = (query) => { 
     return query
       .replace(/\s+/g, " ")
-      .replace(/(\d)\s*x\s*(\d)/g, "$1 x $2")
+      .replace(/(\d)\s*x\s*(\d)/g, "$1x$2")
       .replace(/[^\w\s]/g, "")
       .trim()
       .toLowerCase();

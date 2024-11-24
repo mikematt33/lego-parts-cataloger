@@ -11,15 +11,31 @@ onmessage = (e) => {
     const queryTerms = query.split(" ");
     const stringTerms = string.split(" ");
   
+    // Check if each query term matches any term in the string (startsWith or contains)
     return queryTerms.every((term) =>
-      stringTerms.some((stringTerm) => stringTerm.startsWith(term))
+      stringTerms.some((stringTerm) => stringTerm.includes(term))
     );
   };
 
+  const normalizeString = (string) => {
+    return string
+      .replace(/\s+/g, " ")
+      .replace(/(\d)\s*x\s*(\d)/g, "$1x$2")
+      .replace(/[^\w\s]/g, "")
+      .trim()
+      .toLowerCase();
+  };
+  
+  const normalizedData = data.map((item) => ({
+    ...item,
+    normalizedPartNum: normalizeString(item.part_num),
+    normalizedName: normalizeString(item.name),
+  }));
+
   // function to do the actual search
-  const filteredData = data.filter((item) =>
-    matchTerms(item.part_num, normalizedQuery) ||
-    matchTerms(item.name, normalizedQuery)
+  const filteredData = normalizedData.filter((item) =>
+    matchTerms(item.normalizedPartNum, normalizedQuery) ||
+    matchTerms(item.normalizedName, normalizedQuery)
   );
 
   // Paginate the results
