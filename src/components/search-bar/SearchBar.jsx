@@ -10,7 +10,9 @@ const App = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [worker, setWorker] = useState(null); // use this to keep the webworker we create in useEffect
   const itemsPerPage = 100;
-  const debounceTime = 200; // debounce time in milliseconds
+  const debounceTime = 200; // debounce time in milliseconds  
+  const [isLoading, setIsLoading] = useState(false); // state that tracks whether or not the webworker is searching
+
 
   // Normalize the given query to be more flexible.
   const normalizeQuery = (query) => { 
@@ -30,11 +32,13 @@ const App = () => {
     searchWorker.onmessage = (e) => {
       setFilteredResults(e.data.paginatedData);
       setTotalResults(e.data.totalResults);
+      setIsLoading(false); // when the message is handled, the search has concluded
     };
 
     // error logging for debug
     searchWorker.onerror = (error) => {
       console.error("searchWorker error: ", error)
+      setIsLoading(false); // the search stops if there is an error
     };
 
     setWorker(searchWorker);
@@ -60,6 +64,7 @@ const App = () => {
   useEffect(() => { 
     // Now use the web worker to search with the debounced query
     if (debouncedSearchQuery) {
+      setIsLoading(true); // search starts
       const normalizedQuery = normalizeQuery(debouncedSearchQuery);
       worker.postMessage({
         normalizedQuery, // Change here to match your worker's expected property
@@ -165,6 +170,8 @@ const App = () => {
         onChange={(e) => setSearchQuery(e.target.value)} // Update search query directly here
         placeholder="Search by part number or name"
       />
+
+      {isLoading && <div className="spinner"></div>} {/* Loading sprite */} 
 
       <ul>
         {currentItems.map((item) => (
