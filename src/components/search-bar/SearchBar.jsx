@@ -1,36 +1,84 @@
-import React, { useState } from "react";
-import data from "../../data.js";
-
+import React, { useState, useEffect } from "react";
+import LegoPart from "../lego-part/LegoPart";
 import "./search-bar.css";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState(data);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
+  const [worker, setWorker] = useState(null); // use this to keep the webworker we create in useEffect
+  const itemsPerPage = 100;
+  const debounceTime = 200; // debounce time in milliseconds  
+  const [isLoading, setIsLoading] = useState(false); // state that tracks whether or not the webworker is searching
 
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
 
-    if (query === "") {
-      setFilteredData(data);
-    } else {
-      const filtered = data.filter(
-        (item) =>
-          item.part_num.toLowerCase().includes(query) ||
-          item.name.toLowerCase().includes(query)
-      );
-      setFilteredData(filtered);
-      setCurrentPage(1);
-    }
+  // Normalize the given query to be more flexible.
+  const normalizeQuery = (query) => { 
+    return query
+      .replace(/\s+/g, " ")
+      .replace(/(\d)\s*x\s*(\d)/g, "$1x$2")
+      .replace(/[^\w\s]/g, "")
+      .trim()
+      .toLowerCase();
   };
+
+  useEffect(() => {
+    // create the webworker here to avoid having to remake it every render
+    const searchWorker = new Worker(new URL("./searchWebWorker.js", import.meta.url));
+
+    // Set up the message handler for the worker
+    searchWorker.onmessage = (e) => {
+      setFilteredResults(e.data.paginatedData);
+      setTotalResults(e.data.totalResults);
+      setIsLoading(false); // when the message is handled, the search has concluded
+    };
+
+    // error logging for debug
+    searchWorker.onerror = (error) => {
+      console.error("searchWorker error: ", error)
+      setIsLoading(false); // the search stops if there is an error
+    };
+
+    setWorker(searchWorker);
+
+    return () => {
+      // Clean up the worker when the component unmounts
+      searchWorker.terminate();
+    };
+  }, []);
+
+  // Debounce the search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, debounceTime);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // triggers for searching (ie. debouncedSearchQuery is changed, or the page changes)
+  useEffect(() => { 
+    // Now use the web worker to search with the debounced query
+    if (debouncedSearchQuery) {
+      setIsLoading(true); // search starts
+      const normalizedQuery = normalizeQuery(debouncedSearchQuery);
+      worker.postMessage({
+        normalizedQuery, // Change here to match your worker's expected property
+        itemsPerPage,
+        currentPage,
+      });
+    }
+  }, [debouncedSearchQuery, currentPage, worker]); // Also trigger when currentPage changes
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredResults.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(totalResults / itemsPerPage); // Corrected to use totalResults
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -48,10 +96,7 @@ const App = () => {
 
     if (currentPage > 1) {
       pages.push(
-        <button
-          key={currentPage - 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
+        <button key={currentPage - 1} onClick={() => handlePageChange(currentPage - 1)}>
           {currentPage - 1}
         </button>
       );
@@ -65,10 +110,7 @@ const App = () => {
 
     if (currentPage < totalPages) {
       pages.push(
-        <button
-          key={currentPage + 1}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
+        <button key={currentPage + 1} onClick={() => handlePageChange(currentPage + 1)}>
           {currentPage + 1}
         </button>
       );
@@ -92,6 +134,19 @@ const App = () => {
     setCurrentPage(newPage);
   };
 
+  const addToList = (quantity, color, condition) => {
+    const listData = JSON.parse(localStorage.getItem("example_name_list")) || [];
+    listData.push({
+      id: 0,
+      name: "example_name",
+      quantity,
+      condition,
+      color,
+    });
+    localStorage.setItem("example_name_list", JSON.stringify(listData));
+  };
+
+  // eslint-disable-next-line
   const highlightText = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -112,31 +167,30 @@ const App = () => {
       <input
         type="text"
         value={searchQuery}
-        onChange={handleSearch}
+        onChange={(e) => setSearchQuery(e.target.value)} // Update search query directly here
         placeholder="Search by part number or name"
       />
 
+      {isLoading && <div className="spinner"></div>} {/* Loading sprite */} 
+
       <ul>
         {currentItems.map((item) => (
-          <li key={item.part_num}>
-            {highlightText(item.part_num, searchQuery)} |{" "}
-            {highlightText(item.name, searchQuery)}
-          </li>
+          <LegoPart
+            key={item.part_num}
+            isPersonalList={false}
+            partIdInput={item.part_num}
+            partTitleInput={item.name}
+            addToList={addToList}
+          />
         ))}
       </ul>
 
       <div className="pagination">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
           Previous
         </button>
         {renderPageNumbers()}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
