@@ -5,6 +5,8 @@ const csv = require("csv-parser");
 const csvFilePath = path.join(__dirname, "parts.csv");
 const outputFilePath = path.join(__dirname, "src/data.js");
 
+const disableFilter = process.argv.includes("--no-filter");
+
 function readCSV(filePath) {
   return new Promise((resolve, reject) => {
     const rows = [];
@@ -14,6 +16,21 @@ function readCSV(filePath) {
       .on("end", () => resolve(rows))
       .on("error", (err) => reject(err));
   });
+}
+
+function filterCSV(rows) {
+  if (disableFilter) {
+    return rows;
+  }
+
+  return rows.filter(
+    (row) =>
+      !row["name"].includes("Sticker") &&
+      !row["name"].includes("Duplo") &&
+      !row["name"].includes("Quatro") &&
+      !row["name"].includes("Primo") &&
+      !row["part_num"].includes("pr")
+  );
 }
 
 function writeJSFile(filePath, data) {
@@ -28,7 +45,10 @@ function writeJSFile(filePath, data) {
 async function generateJSFromCSV() {
   try {
     const csvData = await readCSV(csvFilePath);
-    writeJSFile(outputFilePath, csvData);
+
+    const filteredData = filterCSV(csvData);
+
+    writeJSFile(outputFilePath, filteredData);
     console.log("JavaScript file successfully generated.");
   } catch (error) {
     console.error("Error:", error);

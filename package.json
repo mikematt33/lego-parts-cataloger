@@ -19,7 +19,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate-data": "node generateData.js"
+    "generate-data": "node generateData.js",
+    "generate-data-no-filter": "node generate-data.js --no-filter"
   },
   "eslintConfig": {
     "extends": [
