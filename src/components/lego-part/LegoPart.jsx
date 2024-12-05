@@ -17,6 +17,7 @@ const LegoPart = ({
   const [partTitle, setPartTitle] = useState(partTitleInput);
   const [colorName, setColorName] = useState(colorNameInput);
   const [colorHex, setColorHex] = useState(colorHexInput);
+  const [colorId, setColorId] = useState(0);
   const [condition, setCondition] = useState(conditionInput);
   const [quantity, setQuantity] = useState(quantityInput);
   const [imgPath, setImgPath] = useState(`/public/images/${partId}.png`);
@@ -38,6 +39,7 @@ const LegoPart = ({
   const handleColorChange = (event) => {
     setColorName(event.name);
     setColorHex(event.rgb);
+    setColorId(event.id);
   };
 
   const handleConditionChange = (event) => {
@@ -110,10 +112,12 @@ const LegoPart = ({
               colorName,
               colorHex,
               condition,
-              quantity
+              quantity,
+              colorId
             );
             setColorName(undefined);
             setColorHex(undefined);
+            setColorId(0);
             setCondition(undefined);
             setQuantity(0);
             setColorKey((prevKey) => prevKey + 1);
